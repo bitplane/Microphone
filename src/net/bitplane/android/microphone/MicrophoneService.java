@@ -94,33 +94,45 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 		Thread t = new Thread() {
 			public void run() {
 				
-				Log.d(APP_TAG, "Recording...");
-
-				int d = mAudioOutput.getState();
+				Log.d(APP_TAG, "Entered record loop");
 				
 				if ( mAudioOutput.getState() != AudioTrack.STATE_INITIALIZED || mAudioInput.getState() != AudioTrack.STATE_INITIALIZED) {
 					Log.d(APP_TAG, "Can't start. Race condition?");
 					return;
 				}
 				
-				mAudioOutput.play();
-				mAudioInput.startRecording();
-			
-		        ByteBuffer bytes = ByteBuffer.allocateDirect(mInBufferSize);
-		        int o = 0;
-			        
-		        while(mActive) {
-		        	o = mAudioInput.read(bytes, mInBufferSize);
-		        	byte b[] = new byte[o];
-		        	bytes.get(b);
-		        	bytes.rewind();
-		        	mAudioOutput.write(b, 0, o);
-		        }
+				try {
+				
+					try { mAudioOutput.play(); }          catch (Exception e) { Log.d(APP_TAG, "Failed to start playback"); return; }
+					try { mAudioInput.startRecording(); } catch (Exception e) { Log.d(APP_TAG, "Failed to start recording"); mAudioOutput.stop(); return; }
+					
+					try {
+				
+				        ByteBuffer bytes = ByteBuffer.allocateDirect(mInBufferSize);
+				        int o = 0;
+					        
+				        while(mActive) {
+				        	o = mAudioInput.read(bytes, mInBufferSize);
+				        	byte b[] = new byte[o];
+				        	bytes.get(b);
+				        	bytes.rewind();
+				        	mAudioOutput.write(b, 0, o);
+				        }
+				        
+				        Log.d(APP_TAG, "Finished recording");
+					}
+					catch (Exception e) {
+						Log.d(APP_TAG, "Error while recording, aborting.");
+					}
 		        
-		        Log.d(APP_TAG, "Finished recording");
-		        
-		        mAudioOutput.stop();
-		        mAudioInput.stop();			
+			        try { mAudioOutput.stop(); } catch (Exception e) { Log.d(APP_TAG, "Can't stop playback"); mAudioInput.stop(); return; }
+			        try { mAudioInput.stop();  } catch (Exception e) { Log.d(APP_TAG, "Can't stop recording"); return; }
+				}
+				catch (Exception e) {
+					Log.d(APP_TAG, "Error somewhere in record loop.");				
+				}
+				
+				Log.d(APP_TAG, "Record loop finished");
 			}
 		};
 		
