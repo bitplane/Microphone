@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -147,9 +148,6 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
 			SharedPreferences.Editor e = mSharedPreferences.edit();
 			e.putBoolean("active", !mActive);
 			e.commit();
-			
-			ImageButton b = (ImageButton)findViewById(R.id.RecordButton);
-			b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.green));
 		}
 	}
 
@@ -169,6 +167,8 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
 					stopService(new Intent(this, MicrophoneService.class));
 				}
 				mActive = bActive;
+				ImageButton b = (ImageButton)findViewById(R.id.RecordButton);
+				b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.green));
 			}
 		}
 		
