@@ -6,8 +6,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.media.AudioFormat;
@@ -32,6 +34,23 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 	SharedPreferences               mSharedPreferences;
 	private static boolean          mActive = false;
 	private NotificationManager     mNotificationManager;
+	private MicrophoneReceiver      mBroadcastReceiver;
+	
+	private class MicrophoneReceiver extends BroadcastReceiver {
+	    // Turn the mic off when things get loud
+	    @Override 
+	    public void onReceive(Context context, Intent intent) {
+	        String action = intent.getAction();
+	    	if (action != null && action.equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+	    	
+	    		SharedPreferences prefs = context.getSharedPreferences(APP_TAG, Context.MODE_PRIVATE);
+	    	
+	    		SharedPreferences.Editor e = prefs.edit();
+	    		e.putBoolean("active", false);
+	    		e.commit();
+	    	}
+	   }
+	}   
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -42,10 +61,12 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
     @Override
     public void onCreate() {
     	
-    	Log.d(APP_TAG, "Creating mic service"); 
+    	Log.d(APP_TAG, "Creating mic service");
     	
     	// notification service
     	mNotificationManager  = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    	
+    	mBroadcastReceiver = new MicrophoneReceiver();
     	
     	// create input and output streams
         mInBufferSize  = AudioRecord.getMinBufferSize(mSampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO, mFormat);
@@ -57,7 +78,7 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
     	mSharedPreferences = getSharedPreferences(APP_TAG, MODE_PRIVATE);
     	mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
     	mActive = mSharedPreferences.getBoolean("active", false);
-    	
+    	    	
     	if (mActive)
     		record();
     }
@@ -131,6 +152,9 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 				notification.setLatestEventInfo(context, titleText, statusText, pendingCancelIntent);
 				mNotificationManager.notify(0, notification);
 				
+				// allow the 
+				registerReceiver(mBroadcastReceiver, new IntentFilter(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+				
 				Log.d(APP_TAG, "Entered record loop");
 				
 				if ( mAudioOutput.getState() != AudioTrack.STATE_INITIALIZED || mAudioInput.getState() != AudioTrack.STATE_INITIALIZED) {
@@ -169,8 +193,9 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 						Log.d(APP_TAG, "Error somewhere in record loop.");				
 					}
 				}
-				// cancel notification
+				// cancel notification and receiver
 				mNotificationManager.cancel(0);
+				unregisterReceiver(mBroadcastReceiver);
 
 				Log.d(APP_TAG, "Record loop finished");
 			}
