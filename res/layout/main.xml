@@ -9,6 +9,6 @@
     android:layout_width="fill_parent" 
     android:layout_height="fill_parent"
     android:background="@null" 
-    android:src="@drawable/green"
+    android:src="@drawable/mic"
     />
 </LinearLayout>

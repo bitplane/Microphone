@@ -55,7 +55,7 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
     	
     	ImageButton b = (ImageButton)findViewById(R.id.RecordButton);
     	b.setOnClickListener(this);
-    	b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.green));
+    	b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.mic));
     	
         int lastVersion = mSharedPreferences.getInt("lastVersion", 0);
         int thisVersion = -1;
@@ -150,8 +150,6 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
 		}
 	}
 
-    
-
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		// intercept the preference change.
 		
@@ -169,7 +167,7 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
 				runOnUiThread(	new Runnable() {
 									public void run() {
 										ImageButton b = (ImageButton)findViewById(R.id.RecordButton);
-										b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.green));						
+										b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.mic));						
 									}
 								});
 			}
