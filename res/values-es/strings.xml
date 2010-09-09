@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">Acerca</string>
+	<string name="app_name">Micrófono</string>
+	<string name="mic_active">Micrófono está activo</string>
+	<string name="cancel_mic">Haz clic aquí para cancelar</string>
+</resources>

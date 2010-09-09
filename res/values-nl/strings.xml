@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">Over</string>
+	<string name="app_name">Microfoon</string>
+	<string name="mic_active">Microfoon actief</string>
+	<string name="cancel_mic">Klik om te annuleren</string>
+</resources>

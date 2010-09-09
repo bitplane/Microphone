@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">О программе</string>
+	<string name="app_name">Микрофон</string>
+	<string name="mic_active">Микрофон активен</string>
+	<string name="cancel_mic">Нажмите, чтобы отменить</string>
+</resources>

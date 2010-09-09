@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">について</string>
+	<string name="app_name">マイク</string>
+	<string name="mic_active">マイクがアクティブである</string>
+	<string name="cancel_mic">をクリックしてキャンセルします。</string>
+</resources>

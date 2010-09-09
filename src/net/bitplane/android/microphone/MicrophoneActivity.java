@@ -166,8 +166,12 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
 					stopService(new Intent(this, MicrophoneService.class));
 				}
 				mActive = bActive;
-				ImageButton b = (ImageButton)findViewById(R.id.RecordButton);
-				b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.green));
+				runOnUiThread(	new Runnable() {
+									public void run() {
+										ImageButton b = (ImageButton)findViewById(R.id.RecordButton);
+										b.setImageBitmap(BitmapFactory.decodeResource(getResources(), mActive ? R.drawable.red : R.drawable.green));						
+									}
+								});
 			}
 		}
 		

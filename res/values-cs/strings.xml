@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">O</string>
+	<string name="app_name">Mikrofon</string>
+	<string name="mic_active">Mikrofon je aktivní</string>
+	<string name="cancel_mic">Klepnutím zrušíte</string>
+</resources>

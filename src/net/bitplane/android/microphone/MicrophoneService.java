@@ -157,6 +157,12 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 				
 				Log.d(APP_TAG, "Entered record loop");
 				
+				recordLoop();
+				
+				Log.d(APP_TAG, "Record loop finished");
+			}
+			
+			private void recordLoop() {
 				if ( mAudioOutput.getState() != AudioTrack.STATE_INITIALIZED || mAudioInput.getState() != AudioTrack.STATE_INITIALIZED) {
 					Log.d(APP_TAG, "Can't start. Race condition?");
 				}
@@ -164,17 +170,16 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 					
 					try {
 					
-						try { mAudioOutput.play(); }          catch (Exception e) { Log.d(APP_TAG, "Failed to start playback"); return; }
-						try { mAudioInput.startRecording(); } catch (Exception e) { Log.d(APP_TAG, "Failed to start recording"); mAudioOutput.stop(); return; }
+						try { mAudioOutput.play(); }          catch (Exception e) { Log.e(APP_TAG, "Failed to start playback"); return; }
+						try { mAudioInput.startRecording(); } catch (Exception e) { Log.e(APP_TAG, "Failed to start recording"); mAudioOutput.stop(); return; }
 						
 						try {
-					
+							
 					        ByteBuffer bytes = ByteBuffer.allocateDirect(mInBufferSize);
 					        int o = 0;
-						        
+					        byte b[] = new byte[mInBufferSize];
 					        while(mActive) {
 					        	o = mAudioInput.read(bytes, mInBufferSize);
-					        	byte b[] = new byte[o];
 					        	bytes.get(b);
 					        	bytes.rewind();
 					        	mAudioOutput.write(b, 0, o);
@@ -186,8 +191,8 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 							Log.d(APP_TAG, "Error while recording, aborting.");
 						}
 			        
-				        try { mAudioOutput.stop(); } catch (Exception e) { Log.d(APP_TAG, "Can't stop playback"); mAudioInput.stop(); return; }
-				        try { mAudioInput.stop();  } catch (Exception e) { Log.d(APP_TAG, "Can't stop recording"); return; }
+				        try { mAudioOutput.stop(); } catch (Exception e) { Log.e(APP_TAG, "Can't stop playback"); mAudioInput.stop(); return; }
+				        try { mAudioInput.stop();  } catch (Exception e) { Log.e(APP_TAG, "Can't stop recording"); return; }
 					}
 					catch (Exception e) {
 						Log.d(APP_TAG, "Error somewhere in record loop.");				
@@ -195,9 +200,9 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 				}
 				// cancel notification and receiver
 				mNotificationManager.cancel(0);
-				unregisterReceiver(mBroadcastReceiver);
-
-				Log.d(APP_TAG, "Record loop finished");
+				try {
+					unregisterReceiver(mBroadcastReceiver);
+				} catch (IllegalArgumentException e) { Log.e(APP_TAG, "Receiver wasn't registered: " + e.toString()); }
 			}
 		};
 		

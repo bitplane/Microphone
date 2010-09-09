@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">Etwa</string>
+	<string name="app_name">Mikrofon</string>
+	<string name="mic_active">Mikrofon ist aktiv</string>
+	<string name="cancel_mic">Klicken sie auf abbrechen</string>
+</resources>

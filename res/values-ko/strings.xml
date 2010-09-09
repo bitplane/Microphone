@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="about">소개</string>
+	<string name="app_name">마이크</string>
+	<string name="mic_active">마이크가 활성화됩니다</string>
+	<string name="cancel_mic">취소를 클릭합니다</string>
+</resources>
