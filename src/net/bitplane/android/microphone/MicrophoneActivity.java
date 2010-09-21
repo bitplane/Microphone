@@ -140,8 +140,6 @@ public class MicrophoneActivity extends Activity implements OnSharedPreferenceCh
     	return dialog;
     }
     
-    
-	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.RecordButton) {
 			SharedPreferences.Editor e = mSharedPreferences.edit();

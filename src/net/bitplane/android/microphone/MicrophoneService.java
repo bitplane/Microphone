@@ -132,6 +132,9 @@ public class MicrophoneService extends Service implements OnSharedPreferenceChan
 			
 			if (mActive)
 				record();
+			
+			if (!mActive)
+				mNotificationManager.cancel(0);
 		}
 	}
 	
