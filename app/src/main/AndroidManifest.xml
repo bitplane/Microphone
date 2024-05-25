@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.bitplane.android.microphone">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+
+        <activity
+            android:name=".PermissionActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MicrophoneActivity"
+            android:exported="true"/>
+
+        <service
+            android:name=".MicrophoneService"
+            android:exported="true"
+            android:permission="android.permission.RECORD_AUDIO">
+            <intent-filter>
+                <!-- This is a custom intent to cancel recording -->
+                <action android:name="net.bitplane.android.microphone.STOP" />
+                <data android:scheme="null" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </service>
+
+    </application>
+</manifest>
