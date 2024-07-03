@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<string name="about">About</string>
-	<string name="app_name">Microphone</string>
-	<string name="mic_active">Microphone is active</string>
-	<string name="cancel_mic">Click to cancel</string>
-</resources>
