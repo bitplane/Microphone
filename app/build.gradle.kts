@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId = "net.bitplane.android.microphone"
-        minSdk = 19
+        minSdk = 21
         targetSdk = 34
-        versionCode = 7
-        versionName = "0.7"
+        versionCode = 8
+        versionName = "0.8"
     }
 
     buildTypes {
@@ -31,6 +31,8 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    lint.disable += "MissingTranslation"
 }
 
 dependencies {
