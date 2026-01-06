@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -5,12 +7,12 @@ plugins {
 
 android {
     namespace = "net.bitplane.android.microphone"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "net.bitplane.android.microphone"
-        minSdk = 21
-        targetSdk = 34
+        minSdk = 23
+        targetSdk = 36
         versionCode = 8
         versionName = "0.8"
     }
@@ -24,21 +26,19 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+
+    kotlin { compilerOptions { jvmTarget = JvmTarget.JVM_21 } }
 
     lint.disable += "MissingTranslation"
 }
 
 dependencies {
     implementation(libs.appcompat)
-    implementation(libs.material)
     implementation(libs.activity)
-    implementation(libs.constraintlayout)
     implementation(libs.core.ktx)
 }

@@ -17,7 +17,6 @@ import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.AudioTrack
 import android.media.MediaRecorder
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -25,6 +24,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import java.nio.ByteBuffer
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 class MicrophoneService : Service(), OnSharedPreferenceChangeListener {
     private val mSampleRate = 44100
@@ -93,9 +94,9 @@ class MicrophoneService : Service(), OnSharedPreferenceChangeListener {
     override fun onDestroy() {
         Log.d(APP_TAG, "Stopping mic service")
 
-        val e = mSharedPreferences.edit()
-        e.putBoolean("active", false)
-        e.apply()
+        mSharedPreferences.edit {
+            putBoolean("active", false)
+        }
 
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         mAudioInput!!.release()
@@ -111,9 +112,9 @@ class MicrophoneService : Service(), OnSharedPreferenceChangeListener {
         if (intent.action != null) {
             if (intent.action == "net.bitplane.android.microphone.STOP") {
                 Log.d(APP_TAG, "Cancelling recording via notification click")
-                val e = mSharedPreferences.edit()
-                e.putBoolean("active", false)
-                e.apply()
+                mSharedPreferences.edit {
+                    putBoolean("active", false)
+                }
             }
         }
     }
@@ -125,7 +126,7 @@ class MicrophoneService : Service(), OnSharedPreferenceChangeListener {
 
         val bActive = sharedPreferences.getBoolean("active", false)
 
-        Log.d(APP_TAG, "Mic state changing (from " + mActive + " to " + bActive + ")")
+        Log.d(APP_TAG, "Mic state changing (from $mActive to $bActive)")
 
         if (bActive != mActive) {
             mActive = bActive
@@ -141,7 +142,7 @@ class MicrophoneService : Service(), OnSharedPreferenceChangeListener {
             override fun run() {
                 val cancelIntent = Intent()
                 cancelIntent.setAction("net.bitplane.android.microphone.STOP")
-                cancelIntent.setData(Uri.parse("null://null"))
+                cancelIntent.setData("null://null".toUri())
                 cancelIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 val pendingCancelIntent = PendingIntent.getService(
                     applicationContext,
@@ -263,9 +264,9 @@ class MicrophoneService : Service(), OnSharedPreferenceChangeListener {
             val action = intent.action
             if (action != null && action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
                 val prefs = context.getSharedPreferences(APP_TAG, MODE_PRIVATE)
-                val e = prefs.edit()
-                e.putBoolean("active", false)
-                e.apply()
+                prefs.edit {
+                    putBoolean("active", false)
+                }
             }
         }
     }

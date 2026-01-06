@@ -5,8 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,7 +15,9 @@ import android.view.View
 import android.webkit.WebView
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import java.io.IOException
+import androidx.core.content.edit
 
 class MicrophoneActivity : AppCompatActivity(), OnSharedPreferenceChangeListener,
     View.OnClickListener {
@@ -43,21 +44,31 @@ class MicrophoneActivity : AppCompatActivity(), OnSharedPreferenceChangeListener
         val b = findViewById<ImageButton>(R.id.RecordButton)
         b.setOnClickListener(this)
         b.setImageDrawable(
-            if (mActive) getDrawable(R.drawable.baseline_mic_24) else getDrawable(R.drawable.baseline_mic_24_black)
+            if (mActive) {
+                AppCompatResources.getDrawable(this, R.drawable.baseline_mic_24)
+            } else {
+                AppCompatResources.getDrawable(this, R.drawable.baseline_mic_24_black)
+            }
         )
 
-        val lastVersion = mSharedPreferences.getInt("lastVersion", 0)
-        var thisVersion = -1
-        try {
-            thisVersion = packageManager.getPackageInfo(packageName, 0).versionCode
-        } catch (ignored: PackageManager.NameNotFoundException) {
-        }
-
+        val lastVersion = mSharedPreferences.getLong("lastVersionLong", -1L)
+        val thisVersion = getAppVersionCodeCompat()
         if (lastVersion != thisVersion) {
-            val e = mSharedPreferences.edit()
-            e.putInt("lastVersion", thisVersion)
-            e.apply()
+            mSharedPreferences.edit {
+                putLong("lastVersionLong", thisVersion)
+            }
+
             showDialog(ABOUT_DIALOG_ID)
+        }
+    }
+
+    private fun getAppVersionCodeCompat(): Long {
+        val info = packageManager.getPackageInfo(packageName, 0)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            info.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            info.versionCode.toLong()
         }
     }
 
@@ -117,9 +128,9 @@ class MicrophoneActivity : AppCompatActivity(), OnSharedPreferenceChangeListener
 
     override fun onClick(v: View) {
         if (v.id == R.id.RecordButton) {
-            val e = mSharedPreferences.edit()
-            e.putBoolean("active", !mActive)
-            e.apply()
+            mSharedPreferences.edit {
+                putBoolean("active", !mActive)
+            }
         }
     }
 
@@ -137,7 +148,11 @@ class MicrophoneActivity : AppCompatActivity(), OnSharedPreferenceChangeListener
                 runOnUiThread {
                     val b = findViewById<ImageButton>(R.id.RecordButton)
                     b.setImageDrawable(
-                        if (mActive) getDrawable(R.drawable.baseline_mic_24) else getDrawable(R.drawable.baseline_mic_24_black)
+                        if (mActive) {
+                            AppCompatResources.getDrawable(this, R.drawable.baseline_mic_24)
+                        } else {
+                            AppCompatResources.getDrawable(this, R.drawable.baseline_mic_24_black)
+                        }
                     )
                 }
             }
