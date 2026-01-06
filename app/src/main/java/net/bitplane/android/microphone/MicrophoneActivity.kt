@@ -19,8 +19,6 @@ import net.bitplane.android.microphone.ui.AboutDialog
 import net.bitplane.android.microphone.ui.MicrophoneScreen
 import net.bitplane.android.microphone.ui.MicrophoneTheme
 import net.bitplane.android.microphone.ui.PermissionScreen
-import java.io.IOException
-import java.io.InputStream
 
 class MicrophoneActivity : ComponentActivity(),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -62,8 +60,6 @@ class MicrophoneActivity : ComponentActivity(),
         val showAboutOnStart = lastVersion != thisVersion
         AppPreferences.setLastVersion(mSharedPreferences, thisVersion)
 
-        val aboutHtml = loadAboutHtml()
-
         if (!hasPermissions) {
             requestPermissionsFlow()
         }
@@ -87,7 +83,6 @@ class MicrophoneActivity : ComponentActivity(),
 
                 if (showAbout && hasPermissions) {
                     AboutDialog(
-                        aboutHtml = aboutHtml,
                         onDismiss = { showAbout = false }
                     )
                 }
@@ -124,20 +119,6 @@ class MicrophoneActivity : ComponentActivity(),
     public override fun onDestroy() {
         super.onDestroy()
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    private fun loadAboutHtml(): String {
-        val inputStream: InputStream = try {
-            applicationContext.resources.openRawResource(R.raw.about)
-        } catch (_: Exception) {
-            return ""
-        }
-
-        return try {
-            inputStream.bufferedReader().use { it.readText() }
-        } catch (_: IOException) {
-            ""
-        }
     }
 
     private fun toggleActive() {
