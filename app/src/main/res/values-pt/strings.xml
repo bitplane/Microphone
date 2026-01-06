@@ -4,4 +4,6 @@
     <string name="app_name">Microfone</string>
     <string name="mic_active">O microfone está ativo</string>
     <string name="cancel_mic">Clique para cancelar</string>
+    <string name="app_grant_the_permissions">Este aplicativo requer permissão para gravar áudio e enviar notificações. Conceda as permissões.</string>
+    <string name="grant_permissions">Conceder permissões</string>
 </resources>

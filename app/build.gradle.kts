@@ -1,44 +1,54 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "net.bitplane.android.microphone"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "net.bitplane.android.microphone"
-        minSdk = 21
-        targetSdk = 34
-        versionCode = 8
-        versionName = "0.8"
+        minSdk = 23
+        targetSdk = 36
+        versionCode = 9
+        versionName = "0.9"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+
+    buildFeatures {
+        compose = true
     }
 
-    lint.disable += "MissingTranslation"
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    kotlin { compilerOptions { jvmTarget = JvmTarget.JVM_21 } }
 }
 
 dependencies {
     implementation(libs.appcompat)
-    implementation(libs.material)
     implementation(libs.activity)
-    implementation(libs.constraintlayout)
     implementation(libs.core.ktx)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.activity.compose)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
 }

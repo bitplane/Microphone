@@ -1,150 +1,155 @@
 package net.bitplane.android.microphone
 
-import android.app.AlertDialog
-import android.app.Dialog
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.webkit.WebView
-import android.widget.ImageButton
-import androidx.appcompat.app.AppCompatActivity
-import java.io.IOException
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
+import net.bitplane.android.microphone.ui.AboutDialog
+import net.bitplane.android.microphone.ui.MicrophoneScreen
+import net.bitplane.android.microphone.ui.MicrophoneTheme
+import net.bitplane.android.microphone.ui.PermissionScreen
 
-class MicrophoneActivity : AppCompatActivity(), OnSharedPreferenceChangeListener,
-    View.OnClickListener {
-    private val ABOUT_DIALOG_ID = 0
+class MicrophoneActivity : ComponentActivity(),
+    SharedPreferences.OnSharedPreferenceChangeListener {
     private lateinit var mSharedPreferences: SharedPreferences
-    private var mActive: Boolean = false
+    private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    private var mActive by mutableStateOf(false)
+    private var hasPermissions by mutableStateOf(false)
+    private var showPermissionExplanation by mutableStateOf(false)
 
-    /**
-     * Called when the activity is first created.
-     */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d(APP_TAG, "Opening mic activity")
-        mSharedPreferences = getSharedPreferences(APP_TAG, MODE_PRIVATE)
+        mSharedPreferences = AppPreferences.prefs(this)
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        mActive = mSharedPreferences.getBoolean("active", false)
-        val intent = Intent(this, MicrophoneService::class.java)
-        if (mActive) {
-            startService(intent)
-        }
+        mActive = AppPreferences.isActive(mSharedPreferences)
+        hasPermissions = refreshPermissionState()
 
-        setContentView(R.layout.main)
-        val b = findViewById<ImageButton>(R.id.RecordButton)
-        b.setOnClickListener(this)
-        b.setImageDrawable(
-            if (mActive) getDrawable(R.drawable.baseline_mic_24) else getDrawable(R.drawable.baseline_mic_24_black)
-        )
-
-        val lastVersion = mSharedPreferences.getInt("lastVersion", 0)
-        var thisVersion = -1
-        try {
-            thisVersion = packageManager.getPackageInfo(packageName, 0).versionCode
-        } catch (ignored: PackageManager.NameNotFoundException) {
-        }
-
-        if (lastVersion != thisVersion) {
-            val e = mSharedPreferences.edit()
-            e.putInt("lastVersion", thisVersion)
-            e.apply()
-            showDialog(ABOUT_DIALOG_ID)
-        }
-    }
-
-    public override fun onDestroy() {
-        super.onDestroy()
-        Log.d(APP_TAG, "Closing mic activity")
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.options_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        if (item.itemId == R.id.about) {
-            showDialog(ABOUT_DIALOG_ID)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    @Deprecated("Deprecated in Java")
-    public override fun onCreateDialog(id: Int): Dialog {
-        var dialog: Dialog? = null
-        if (id == ABOUT_DIALOG_ID) {
-            val b = AlertDialog.Builder(this)
-            b.setTitle(getString(R.string.about))
-
-            val inflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val aboutView = inflater.inflate(R.layout.about, findViewById(R.id.AboutWebView))
-
-            b.setView(aboutView)
-
-            var data = ""
-
-            val `in` = applicationContext.resources.openRawResource(R.raw.about)
-            try {
-                var ch: Int
-                val buf = StringBuilder()
-                while ((`in`.read().also { ch = it }) != -1) {
-                    buf.append(ch.toChar())
+        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { results ->
+            hasPermissions = refreshPermissionState()
+            val allGranted = results.values.all { it }
+            if (allGranted && hasPermissions) {
+                showPermissionExplanation = false
+                if (mActive) {
+                    startService(Intent(this, MicrophoneService::class.java))
                 }
-                data = buf.toString()
-            } catch (ignored: IOException) {
+            } else {
+                showPermissionExplanation = true
             }
-
-            val wv = aboutView.findViewById<WebView>(R.id.AboutWebView)
-            wv.loadDataWithBaseURL(null, data, "text/html", "UTF-8", null)
-
-            dialog = b.create()
         }
-        return dialog!!
-    }
 
-    override fun onClick(v: View) {
-        if (v.id == R.id.RecordButton) {
-            val e = mSharedPreferences.edit()
-            e.putBoolean("active", !mActive)
-            e.apply()
+        if (mActive && hasPermissions) {
+            startService(Intent(this, MicrophoneService::class.java))
         }
-    }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        if (key != null && key == "active") {
-            val bActive = sharedPreferences.getBoolean("active", false)
-            val intent = Intent(this, MicrophoneService::class.java)
-            if (bActive != mActive) {
-                if (bActive) {
-                    startService(intent)
+        val lastVersion = AppPreferences.lastVersion(mSharedPreferences)
+        val thisVersion = getAppVersionCodeCompat()
+        val showAboutOnStart = lastVersion != thisVersion
+        AppPreferences.setLastVersion(mSharedPreferences, thisVersion)
+
+        if (!hasPermissions) {
+            requestPermissionsFlow()
+        }
+
+        setContent {
+            MicrophoneTheme {
+                var showAbout by rememberSaveable { mutableStateOf(showAboutOnStart) }
+
+                if (hasPermissions) {
+                    MicrophoneScreen(
+                        active = mActive,
+                        onToggle = { toggleActive() },
+                        onShowAbout = { showAbout = true },
+                    )
                 } else {
-                    stopService(intent)
+                    PermissionScreen(
+                        showExplanation = showPermissionExplanation,
+                        onRequestPermissions = { requestPermissionsFlow() }
+                    )
                 }
-                mActive = bActive
-                runOnUiThread {
-                    val b = findViewById<ImageButton>(R.id.RecordButton)
-                    b.setImageDrawable(
-                        if (mActive) getDrawable(R.drawable.baseline_mic_24) else getDrawable(R.drawable.baseline_mic_24_black)
+
+                if (showAbout && hasPermissions) {
+                    AboutDialog(
+                        onDismiss = { showAbout = false }
                     )
                 }
             }
         }
     }
 
-    companion object {
-        private const val APP_TAG = "Microphone"
+    private fun refreshPermissionState(): Boolean =
+        hasAudioPermission() && hasNotificationPermission()
+
+    private fun hasAudioPermission(): Boolean =
+        ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+
+    private fun hasNotificationPermission(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+
+    private fun getAppVersionCodeCompat(): Long {
+        val info = packageManager.getPackageInfo(packageName, 0)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            info.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            info.versionCode.toLong()
+        }
+    }
+
+    public override fun onDestroy() {
+        super.onDestroy()
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun toggleActive() {
+        if (!hasPermissions) {
+            requestPermissionsFlow()
+            return
+        }
+        AppPreferences.setActive(mSharedPreferences, !mActive)
+    }
+
+    private fun requestPermissionsFlow() {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            arrayOf(Manifest.permission.RECORD_AUDIO)
+        }
+        permissionLauncher.launch(permissions)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        if (key != null && key == AppPreferences.KEY_ACTIVE) {
+            val bActive = sharedPreferences.getBoolean(AppPreferences.KEY_ACTIVE, false)
+            val intent = Intent(this, MicrophoneService::class.java)
+            if (bActive != mActive) {
+                if (bActive && hasPermissions) {
+                    startService(intent)
+                } else {
+                    stopService(intent)
+                }
+                mActive = bActive
+            }
+        }
     }
 }

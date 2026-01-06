@@ -4,4 +4,6 @@
     <string name="app_name">Mikrofon</string>
     <string name="mic_active">Mikrofon je aktivní</string>
     <string name="cancel_mic">Klepnutím zrušíte</string>
+    <string name="app_grant_the_permissions">Tato aplikace vyžaduje oprávnění k nahrávání zvuku a odesílání oznámení. Udělte prosím oprávnění.</string>
+    <string name="grant_permissions">Udělte oprávnění</string>
 </resources>
