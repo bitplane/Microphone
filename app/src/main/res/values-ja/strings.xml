@@ -4,4 +4,6 @@
     <string name="app_name">マイク</string>
     <string name="mic_active">マイクがアクティブである</string>
     <string name="cancel_mic">をクリックしてキャンセルします。</string>
+    <string name="app_grant_the_permissions">このアプリは音声の録音と通知の送信許可が必要です。権限を付与してください。</string>
+    <string name="grant_permissions">権限を付与</string>
 </resources>

@@ -4,4 +4,6 @@
     <string name="app_name">麦克风</string>
     <string name="mic_active">麦克风活跃</string>
     <string name="cancel_mic">点击取消</string>
+    <string name="app_grant_the_permissions">此应用需要录音和发送通知权限，请授予权限。</string>
+    <string name="grant_permissions">授予权限</string>
 </resources>

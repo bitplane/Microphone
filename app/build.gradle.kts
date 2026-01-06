@@ -39,8 +39,6 @@ android {
     }
 
     kotlin { compilerOptions { jvmTarget = JvmTarget.JVM_21 } }
-
-    lint.disable += "MissingTranslation"
 }
 
 dependencies {

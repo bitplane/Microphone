@@ -4,4 +4,6 @@
     <string name="app_name">Microfoon</string>
     <string name="mic_active">Microfoon actief</string>
     <string name="cancel_mic">Klik om te annuleren</string>
+    <string name="app_grant_the_permissions">Deze app heeft toestemming nodig om audio op te nemen en meldingen te verzenden. Geef de machtigingen.</string>
+    <string name="grant_permissions">Machtigingen geven</string>
 </resources>

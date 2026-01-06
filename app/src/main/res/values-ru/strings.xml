@@ -4,4 +4,6 @@
     <string name="app_name">Микрофон</string>
     <string name="mic_active">Микрофон активен</string>
     <string name="cancel_mic">Нажмите, чтобы отменить</string>
+    <string name="app_grant_the_permissions">Этому приложению нужны разрешения на запись аудио и отправку уведомлений. Пожалуйста, выдайте разрешения.</string>
+    <string name="grant_permissions">Выдать разрешения</string>
 </resources>

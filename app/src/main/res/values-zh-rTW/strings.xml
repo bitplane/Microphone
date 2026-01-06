@@ -4,4 +4,6 @@
     <string name="app_name">麥克風</string>
     <string name="mic_active">麥克風活躍</string>
     <string name="cancel_mic">點擊取消</string>
+    <string name="app_grant_the_permissions">此應用需要錄音與傳送通知的權限，請授予權限。</string>
+    <string name="grant_permissions">授予權限</string>
 </resources>
