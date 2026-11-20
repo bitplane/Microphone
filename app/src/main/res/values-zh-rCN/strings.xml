@@ -5,4 +5,8 @@
     <string name="cancel_mic">点击取消</string>
     <string name="app_grant_the_permissions">此应用需要录音和发送通知权限，请授予权限。</string>
     <string name="grant_permissions">授予权限</string>
+    <string name="input_label">输入</string>
+    <string name="input_automatic">自动</string>
+    <string name="input_phone">手机麦克风</string>
+    <string name="input_headset">耳机麦克风</string>
 </resources>

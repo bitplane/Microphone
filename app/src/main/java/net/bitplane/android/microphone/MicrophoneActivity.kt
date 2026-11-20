@@ -2,6 +2,9 @@ package net.bitplane.android.microphone
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +21,14 @@ import net.bitplane.android.microphone.ui.PermissionScreen
 
 class MicrophoneActivity : ComponentActivity() {
     private var hasMicPermission by mutableStateOf(false)
+    private var inputs by mutableStateOf(emptyList<InputOption>())
+    private val audioManager by lazy { getSystemService(AudioManager::class.java) }
+
+    // Keeps the input menu in step with devices being plugged in and unplugged.
+    private val deviceCallback = object : AudioDeviceCallback() {
+        override fun onAudioDevicesAdded(added: Array<out AudioDeviceInfo>) = refreshInputs()
+        override fun onAudioDevicesRemoved(removed: Array<out AudioDeviceInfo>) = refreshInputs()
+    }
     private var showPermissionExplanation by mutableStateOf(false)
 
     private val permissionLauncher = registerForActivityResult(
@@ -31,6 +42,7 @@ class MicrophoneActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        AudioInputs.load(this)
         hasMicPermission = checkMicPermission()
         if (!hasMicPermission && savedInstanceState == null) {
             requestPermissions()
@@ -39,11 +51,15 @@ class MicrophoneActivity : ComponentActivity() {
         setContent {
             MicrophoneTheme {
                 val active by MicrophoneService.active.collectAsState()
+                val selectedInput by AudioInputs.selected.collectAsState()
 
                 if (hasMicPermission) {
                     MicrophoneScreen(
                         active = active,
                         onToggle = { toggle(active) },
+                        inputs = inputs,
+                        selectedInput = selectedInput,
+                        onSelectInput = { AudioInputs.select(this, it) },
                     )
                 } else {
                     PermissionScreen(
@@ -53,6 +69,21 @@ class MicrophoneActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        audioManager.registerAudioDeviceCallback(deviceCallback, null)
+        refreshInputs()
+    }
+
+    override fun onStop() {
+        audioManager.unregisterAudioDeviceCallback(deviceCallback)
+        super.onStop()
+    }
+
+    private fun refreshInputs() {
+        inputs = AudioInputs.options(this)
     }
 
     override fun onResume() {

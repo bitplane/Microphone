@@ -5,4 +5,8 @@
     <string name="cancel_mic">Fare clic per annullare</string>
     <string name="app_grant_the_permissions">"Questa app richiede l'autorizzazione a registrare l'audio e inviare notifiche. Concedi le autorizzazioni."</string>
     <string name="grant_permissions">Concedi autorizzazioni</string>
+    <string name="input_label">Ingresso</string>
+    <string name="input_automatic">Automatico</string>
+    <string name="input_phone">Microfono del telefono</string>
+    <string name="input_headset">Microfono delle cuffie</string>
 </resources>

@@ -5,4 +5,8 @@
     <string name="cancel_mic">點擊取消</string>
     <string name="app_grant_the_permissions">此應用需要錄音與傳送通知的權限，請授予權限。</string>
     <string name="grant_permissions">授予權限</string>
+    <string name="input_label">輸入</string>
+    <string name="input_automatic">自動</string>
+    <string name="input_phone">手機麥克風</string>
+    <string name="input_headset">耳機麥克風</string>
 </resources>

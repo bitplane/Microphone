@@ -5,4 +5,8 @@
     <string name="cancel_mic">Clique para cancelar</string>
     <string name="app_grant_the_permissions">Este aplicativo requer permissão para gravar áudio e enviar notificações. Conceda as permissões.</string>
     <string name="grant_permissions">Conceder permissões</string>
+    <string name="input_label">Entrada</string>
+    <string name="input_automatic">Automático</string>
+    <string name="input_phone">Microfone do telefone</string>
+    <string name="input_headset">Microfone do headset</string>
 </resources>
