@@ -231,7 +231,7 @@ class MicrophoneService : Service() {
     }
 
     companion object {
-        private const val TAG = AppPreferences.APP_TAG
+        private const val TAG = "Microphone"
         private const val ACTION_STOP = "net.bitplane.android.microphone.STOP"
         private const val CHANNEL_ID = "microphone_channel_id"
         private const val NOTIFICATION_ID = 1
