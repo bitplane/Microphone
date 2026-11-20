@@ -6,7 +6,10 @@
     <string name="app_grant_the_permissions">此應用需要錄音與傳送通知的權限，請授予權限。</string>
     <string name="grant_permissions">授予權限</string>
     <string name="input_label">輸入</string>
-    <string name="input_automatic">自動</string>
+    <string name="automatic">自動</string>
     <string name="input_phone">手機麥克風</string>
     <string name="input_headset">耳機麥克風</string>
+    <string name="output_label">輸出</string>
+    <string name="output_speaker">手機喇叭</string>
+    <string name="output_headphones">耳機</string>
 </resources>

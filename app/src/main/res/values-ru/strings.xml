@@ -6,7 +6,10 @@
     <string name="app_grant_the_permissions">Этому приложению нужны разрешения на запись аудио и отправку уведомлений. Пожалуйста, выдайте разрешения.</string>
     <string name="grant_permissions">Выдать разрешения</string>
     <string name="input_label">Вход</string>
-    <string name="input_automatic">Автоматически</string>
+    <string name="automatic">Автоматически</string>
     <string name="input_phone">Микрофон телефона</string>
     <string name="input_headset">Микрофон гарнитуры</string>
+    <string name="output_label">Выход</string>
+    <string name="output_speaker">Динамик телефона</string>
+    <string name="output_headphones">Наушники</string>
 </resources>

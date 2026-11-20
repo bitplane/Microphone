@@ -6,7 +6,10 @@
     <string name="app_grant_the_permissions">Esta aplicación requiere permiso para grabar audio y enviar notificaciones. Otorga los permisos.</string>
     <string name="grant_permissions">Conceder permisos</string>
     <string name="input_label">Entrada</string>
-    <string name="input_automatic">Automático</string>
+    <string name="automatic">Automático</string>
     <string name="input_phone">Micrófono del teléfono</string>
     <string name="input_headset">Micrófono de los auriculares</string>
+    <string name="output_label">Salida</string>
+    <string name="output_speaker">Altavoz del teléfono</string>
+    <string name="output_headphones">Auriculares</string>
 </resources>
