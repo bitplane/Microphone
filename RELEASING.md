@@ -1,7 +1,13 @@
 # Releasing
 
-Pushing a tag like `v1.2.3` runs `.github/workflows/release.yml`. That builds a signed bundle,
-uploads it to the Play **internal testing** track, and you promote it from the Play Console.
+Pushing a tag like `v1.2.3` runs `.github/workflows/release.yml`. It:
+
+1. builds an APK and an App Bundle, both signed with the app's original 2010 key;
+2. publishes the APK as a GitHub Release;
+3. uploads the bundle to the Play **internal testing** track, which you then promote from the
+   Play Console. This step is skipped, with a warning, until `PLAY_SERVICE_ACCOUNT_JSON` is set.
+
+Web and Play installs are signed with the same key, so each can upgrade the other.
 
 The version code comes from the tag: `major * 10000 + minor * 100 + patch`, so `v1.0.0` is
 `10000`. Tags must keep going up.
@@ -11,32 +17,36 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+The job runs in the `release` environment. If you add yourself as a required reviewer there, each
+release waits for your approval before it can touch the key.
+
 ## One-off setup
 
-### 1. Enroll in Play App Signing with the original key
+### 1. GitHub secrets (needed for any release)
 
-The app was published in 2010 with a keystore that only exists on your machine. Google needs to
-hold that key before it will accept App Bundles.
-
-Play Console → the app → **Test and release → App integrity → App signing**. Choose to upload
-the key from a Java keystore. Play gives you a PEPK tool and an encryption key. Run the tool
-against the old keystore and upload the encrypted file it produces.
-
-Keep the original keystore backed up somewhere safe and out of this repo. It's no longer needed
-day to day, but it's the app's identity.
-
-### 2. Make an upload key for CI
-
-CI signs with a separate upload key. If that key ever leaks, Google can reset it, which they
-can't do for the app signing key.
+The original keystore is a JKS file at `~/Documents/android.bitplane.net.keystore`, alias
+`gazdroid`. Create an environment called `release` (Settings → Environments), then add these
+secrets to it:
 
 ```sh
-keytool -genkeypair -v -keystore upload.jks -alias upload \
-  -keyalg RSA -keysize 4096 -validity 10000
-keytool -export -rfc -keystore upload.jks -alias upload -file upload_cert.pem
+gh secret set --env release SIGNING_KEYSTORE_BASE64 < <(base64 -w0 ~/Documents/android.bitplane.net.keystore)
+gh secret set --env release SIGNING_KEYSTORE_PASSWORD
+gh secret set --env release SIGNING_KEY_ALIAS --body gazdroid
+gh secret set --env release SIGNING_KEY_PASSWORD   # the same as the keystore password, unless you set them differently
 ```
 
-On the same App signing page, register `upload_cert.pem` as the upload key.
+That's enough for GitHub Releases. Keep a backup of the keystore and its password somewhere
+outside GitHub. If it's lost, the app can never be updated again.
+
+### 2. Play App Signing
+
+The app was published before App Bundles existed. Google needs a copy of the key before it will
+accept a bundle.
+
+Play Console → Microphone → **Test and release → App integrity → App signing**. Choose to upload
+the key from a Java keystore. Play gives you a PEPK tool and an encryption key. Run the tool
+against the keystore and upload the encrypted file it produces. Don't register a separate upload
+key: CI uploads with the same key.
 
 ### 3. Service account for the Play API
 
@@ -46,30 +56,15 @@ On the same App signing page, register `upload_cert.pem` as the upload key.
    Keys → Add key → JSON, and download the key file.
 3. Play Console → **Users and permissions → Invite new users**. Enter the service account's
    email and give it access to this app with **Release apps to testing tracks**.
+4. `gh secret set --env release PLAY_SERVICE_ACCOUNT_JSON < service-account.json`, then delete
+   the JSON file.
 
 New permissions can take a while to work. If the first upload fails with a 403, wait an hour and
-re-run the job.
+re-run the job. The GitHub Release step handles re-runs.
 
-### 4. GitHub secrets
+### 4. Play Console paperwork
 
-In the repo settings, create an environment called `play` (Settings → Environments). Adding
-yourself as a required reviewer there means each release waits for a click before it uploads.
-Then add these secrets to that environment:
-
-```sh
-gh secret set --env play UPLOAD_KEYSTORE_BASE64   < <(base64 -w0 upload.jks)
-gh secret set --env play UPLOAD_KEYSTORE_PASSWORD
-gh secret set --env play UPLOAD_KEY_ALIAS          # "upload" if you used the command above
-gh secret set --env play UPLOAD_KEY_PASSWORD
-gh secret set --env play PLAY_SERVICE_ACCOUNT_JSON < service-account.json
-```
-
-Then delete the local copies of `upload.jks` and the JSON key, or move them somewhere safe.
-
-### 5. Play Console paperwork
-
-Play has added several requirements since 2011. It will block the release until these are done
-under **Policy and programs → App content**:
+Play will block the release until these are done under **Policy and programs → App content**:
 
 - **Privacy policy**: required because the app uses the microphone. Point it at
   `https://github.com/bitplane/Microphone/blob/master/PRIVACY.md`.
@@ -82,3 +77,9 @@ under **Policy and programs → App content**:
 - **Target audience** and **Content rating**: re-answer these if Play asks.
 
 The store listing will also need fresh screenshots.
+
+## Android developer verification
+
+The package name is registered to the bitplane account. That was done by uploading an APK
+containing `assets/adi-registration.properties`. The file only had to be in that one APK, so it
+isn't in the repo.
