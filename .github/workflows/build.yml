@@ -22,7 +22,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
 
       - name: Lint and build
-        run: ./gradlew --console=plain lintDebug assembleDebug
+        # assembleRelease runs R8 and release-only tasks; unsigned here since CI has no keys.
+        run: ./gradlew --console=plain lintDebug assembleDebug assembleRelease
 
       - uses: actions/upload-artifact@v7
         if: always()
