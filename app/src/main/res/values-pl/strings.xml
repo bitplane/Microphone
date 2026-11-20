@@ -5,4 +5,8 @@
     <string name="cancel_mic">Kliknij, aby anulować</string>
     <string name="app_grant_the_permissions">Ta aplikacja wymaga uprawnień do nagrywania dźwięku i wysyłania powiadomień. Udziel uprawnień.</string>
     <string name="grant_permissions">Udziel uprawnień</string>
+    <string name="input_label">Wejście</string>
+    <string name="input_automatic">Automatycznie</string>
+    <string name="input_phone">Mikrofon telefonu</string>
+    <string name="input_headset">Mikrofon zestawu słuchawkowego</string>
 </resources>

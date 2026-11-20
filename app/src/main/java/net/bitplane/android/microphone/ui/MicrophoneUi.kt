@@ -33,6 +33,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import net.bitplane.android.microphone.InputOption
 import net.bitplane.android.microphone.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +54,9 @@ import net.bitplane.android.microphone.R
 fun MicrophoneScreen(
     active: Boolean,
     onToggle: () -> Unit,
+    inputs: List<InputOption>,
+    selectedInput: String?,
+    onSelectInput: (String?) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -48,11 +65,13 @@ fun MicrophoneScreen(
             )
         }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentAlignment = Alignment.Center
+                .padding(padding)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             val isDark = isSystemInDarkTheme()
 
@@ -89,6 +108,56 @@ fun MicrophoneScreen(
                         modifier = Modifier.size(64.dp)
                     )
                 }
+            }
+
+            Spacer(Modifier.height(48.dp))
+
+            InputPicker(
+                inputs = inputs,
+                selected = selectedInput,
+                onSelect = onSelectInput,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun InputPicker(
+    inputs: List<InputOption>,
+    selected: String?,
+    onSelect: (String?) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    // A remembered device that isn't connected right now falls back to automatic.
+    val current = inputs.firstOrNull { it.key == selected } ?: inputs.firstOrNull()
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.widthIn(max = 360.dp),
+    ) {
+        OutlinedTextField(
+            value = current?.label.orEmpty(),
+            onValueChange = {},
+            readOnly = true,
+            singleLine = true,
+            label = { Text(stringResource(R.string.input_label)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            inputs.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.label) },
+                    onClick = {
+                        onSelect(option.key)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
             }
         }
     }
@@ -140,6 +209,12 @@ fun MicrophoneTheme(content: @Composable () -> Unit) {
     )
 }
 
+private val previewInputs = listOf(
+    InputOption(null, "Automatic"),
+    InputOption("phone", "Phone microphone"),
+    InputOption("bt", "Jabra Elite 85t"),
+)
+
 @Preview(name = "Mic inactive")
 @Composable
 private fun MicrophoneScreenPreviewInactive() {
@@ -147,6 +222,9 @@ private fun MicrophoneScreenPreviewInactive() {
         MicrophoneScreen(
             active = false,
             onToggle = {},
+            inputs = previewInputs,
+            selectedInput = null,
+            onSelectInput = {},
         )
     }
 }
@@ -158,6 +236,9 @@ private fun MicrophoneScreenPreviewActive() {
         MicrophoneScreen(
             active = true,
             onToggle = {},
+            inputs = previewInputs,
+            selectedInput = "bt",
+            onSelectInput = {},
         )
     }
 }

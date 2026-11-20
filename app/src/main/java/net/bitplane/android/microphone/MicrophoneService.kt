@@ -13,6 +13,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioRecord
@@ -24,7 +26,11 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -41,6 +47,19 @@ class MicrophoneService : Service() {
     private var running = false
     private var audioThread: Thread? = null
     private var noisyReceiverRegistered = false
+
+    // Set when the chosen input or the connected devices change; the audio loop picks it up.
+    @Volatile
+    private var rerouteNeeded = true
+    private var communicationModeOn = false
+    private val audioManager by lazy { getSystemService(AudioManager::class.java) }
+
+    private val deviceCallback = object : AudioDeviceCallback() {
+        override fun onAudioDevicesAdded(added: Array<out AudioDeviceInfo>) { rerouteNeeded = true }
+        override fun onAudioDevicesRemoved(removed: Array<out AudioDeviceInfo>) { rerouteNeeded = true }
+    }
+    private var selectionWatcher: Job? = null
+    private val scope = MainScope()
 
     private val noisyReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -90,6 +109,11 @@ class MicrophoneService : Service() {
             running = true
             _active.value = true
             registerNoisyReceiver()
+            AudioInputs.load(this)
+            audioManager.registerAudioDeviceCallback(deviceCallback, null)
+            selectionWatcher = scope.launch {
+                AudioInputs.selected.collect { rerouteNeeded = true }
+            }
             audioThread = Thread(::audioLoop, "MicrophoneLoop").also { it.start() }
         }
 
@@ -102,6 +126,9 @@ class MicrophoneService : Service() {
         running = false
         audioThread?.join(1000)
         audioThread = null
+        selectionWatcher?.cancel()
+        scope.cancel()
+        audioManager.unregisterAudioDeviceCallback(deviceCallback)
         if (noisyReceiverRegistered) {
             unregisterReceiver(noisyReceiver)
             noisyReceiverRegistered = false
@@ -142,12 +169,14 @@ class MicrophoneService : Service() {
                 return
             }
 
+            routeInput(input)
             output.play()
             input.startRecording()
             Log.d(TAG, "Entered record loop")
 
             val buffer = ByteArray(inBufferSize)
             while (running) {
+                if (rerouteNeeded) routeInput(input)
                 val read = input.read(buffer, 0, buffer.size)
                 if (read < 0) {
                     Log.e(TAG, "AudioRecord.read failed: $read")
@@ -163,8 +192,45 @@ class MicrophoneService : Service() {
             input?.release()
             output?.runCatching { stop() }
             output?.release()
+            setCommunicationMode(null)
             // If the loop died on its own (not via onDestroy), take the service down with it.
             if (running) stopSelfOnMainThread()
+        }
+    }
+
+    /** Points the recorder at the chosen mic, or lets Android pick if it isn't connected. */
+    private fun routeInput(input: AudioRecord) {
+        rerouteNeeded = false
+        val device = AudioInputs.selected.value?.let { AudioInputs.find(this, it) }
+        Log.d(TAG, "Routing input to ${device?.productName ?: "default"} (type ${device?.type})")
+        setCommunicationMode(device?.takeIf(AudioInputs::needsCommunicationMode))
+        input.preferredDevice = device
+    }
+
+    /**
+     * Bluetooth headset mics are only open during "calls", so switch the phone into
+     * communication mode for them, and back to normal for everything else.
+     */
+    @Suppress("DEPRECATION")
+    private fun setCommunicationMode(bluetoothMic: AudioDeviceInfo?) {
+        if (bluetoothMic != null) {
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                audioManager.setCommunicationDevice(bluetoothMic)
+            } else {
+                audioManager.startBluetoothSco()
+                audioManager.isBluetoothScoOn = true
+            }
+            communicationModeOn = true
+        } else if (communicationModeOn) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                audioManager.clearCommunicationDevice()
+            } else {
+                audioManager.isBluetoothScoOn = false
+                audioManager.stopBluetoothSco()
+            }
+            audioManager.mode = AudioManager.MODE_NORMAL
+            communicationModeOn = false
         }
     }
 
