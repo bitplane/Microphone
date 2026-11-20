@@ -14,12 +14,27 @@ android {
         applicationId = "net.bitplane.android.microphone"
         minSdk = 23
         targetSdk = 36
-        versionCode = 9
-        versionName = "0.9"
+        // CI passes these from the release tag (see .github/workflows/release.yml).
+        versionCode = providers.gradleProperty("versionCode").orNull?.toInt() ?: 9
+        versionName = providers.gradleProperty("versionName").orNull ?: "0.9"
+    }
+
+    // Release signing comes from the environment so the keystore never lives in the repo.
+    val keystorePath = providers.environmentVariable("SIGNING_KEYSTORE_PATH").orNull
+    signingConfigs {
+        if (keystorePath != null) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = providers.environmentVariable("SIGNING_KEYSTORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("SIGNING_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("SIGNING_KEY_PASSWORD").get()
+            }
+        }
     }
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
