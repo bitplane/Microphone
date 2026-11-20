@@ -5,6 +5,8 @@
         android:name="android.permission.POST_NOTIFICATIONS"
         android:minSdkVersion="33" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -23,16 +25,8 @@
 
         <service
             android:name=".MicrophoneService"
-            android:exported="true"
-            android:permission="android.permission.RECORD_AUDIO">
-            <intent-filter>
-                <!-- This is a custom intent to cancel recording -->
-                <action android:name="net.bitplane.android.microphone.STOP" />
-                <data android:scheme="null" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-        </service>
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
 
     </application>
 </manifest>
