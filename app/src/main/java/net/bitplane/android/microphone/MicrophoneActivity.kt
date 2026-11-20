@@ -10,10 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
-import net.bitplane.android.microphone.ui.AboutDialog
 import net.bitplane.android.microphone.ui.MicrophoneScreen
 import net.bitplane.android.microphone.ui.MicrophoneTheme
 import net.bitplane.android.microphone.ui.PermissionScreen
@@ -33,11 +31,6 @@ class MicrophoneActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = AppPreferences.prefs(this)
-        val thisVersion = getAppVersionCodeCompat()
-        val showAboutOnStart = AppPreferences.lastVersion(prefs) != thisVersion
-        AppPreferences.setLastVersion(prefs, thisVersion)
-
         hasMicPermission = checkMicPermission()
         if (!hasMicPermission && savedInstanceState == null) {
             requestPermissions()
@@ -45,24 +38,18 @@ class MicrophoneActivity : ComponentActivity() {
 
         setContent {
             MicrophoneTheme {
-                var showAbout by rememberSaveable { mutableStateOf(showAboutOnStart) }
                 val active by MicrophoneService.active.collectAsState()
 
                 if (hasMicPermission) {
                     MicrophoneScreen(
                         active = active,
                         onToggle = { toggle(active) },
-                        onShowAbout = { showAbout = true },
                     )
                 } else {
                     PermissionScreen(
                         showExplanation = showPermissionExplanation,
                         onRequestPermissions = { requestPermissions() }
                     )
-                }
-
-                if (showAbout && hasMicPermission) {
-                    AboutDialog(onDismiss = { showAbout = false })
                 }
             }
         }
@@ -95,15 +82,5 @@ class MicrophoneActivity : ComponentActivity() {
             arrayOf(Manifest.permission.RECORD_AUDIO)
         }
         permissionLauncher.launch(permissions)
-    }
-
-    private fun getAppVersionCodeCompat(): Long {
-        val info = packageManager.getPackageInfo(packageName, 0)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            info.longVersionCode
-        } else {
-            @Suppress("DEPRECATION")
-            info.versionCode.toLong()
-        }
     }
 }
