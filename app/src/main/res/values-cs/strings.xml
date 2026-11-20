@@ -6,7 +6,10 @@
     <string name="app_grant_the_permissions">Tato aplikace vyžaduje oprávnění k nahrávání zvuku a odesílání oznámení. Udělte prosím oprávnění.</string>
     <string name="grant_permissions">Udělte oprávnění</string>
     <string name="input_label">Vstup</string>
-    <string name="input_automatic">Automaticky</string>
+    <string name="automatic">Automaticky</string>
     <string name="input_phone">Mikrofon telefonu</string>
     <string name="input_headset">Mikrofon náhlavní soupravy</string>
+    <string name="output_label">Výstup</string>
+    <string name="output_speaker">Reproduktor telefonu</string>
+    <string name="output_headphones">Sluchátka</string>
 </resources>

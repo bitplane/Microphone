@@ -48,7 +48,7 @@ class MicrophoneService : Service() {
     private var audioThread: Thread? = null
     private var noisyReceiverRegistered = false
 
-    // Set when the chosen input or the connected devices change; the audio loop picks it up.
+    // Set when a chosen device or the connected devices change; the audio loop picks it up.
     @Volatile
     private var rerouteNeeded = true
     private var communicationModeOn = false
@@ -58,7 +58,7 @@ class MicrophoneService : Service() {
         override fun onAudioDevicesAdded(added: Array<out AudioDeviceInfo>) { rerouteNeeded = true }
         override fun onAudioDevicesRemoved(removed: Array<out AudioDeviceInfo>) { rerouteNeeded = true }
     }
-    private var selectionWatcher: Job? = null
+    private var selectionWatchers: List<Job> = emptyList()
     private val scope = MainScope()
 
     private val noisyReceiver = object : BroadcastReceiver() {
@@ -109,10 +109,10 @@ class MicrophoneService : Service() {
             running = true
             _active.value = true
             registerNoisyReceiver()
-            AudioInputs.load(this)
+            AudioDevices.load(this)
             audioManager.registerAudioDeviceCallback(deviceCallback, null)
-            selectionWatcher = scope.launch {
-                AudioInputs.selected.collect { rerouteNeeded = true }
+            selectionWatchers = listOf(AudioDevices.input, AudioDevices.output).map { choice ->
+                scope.launch { choice.selected.collect { rerouteNeeded = true } }
             }
             audioThread = Thread(::audioLoop, "MicrophoneLoop").also { it.start() }
         }
@@ -126,7 +126,7 @@ class MicrophoneService : Service() {
         running = false
         audioThread?.join(1000)
         audioThread = null
-        selectionWatcher?.cancel()
+        selectionWatchers.forEach { it.cancel() }
         scope.cancel()
         audioManager.unregisterAudioDeviceCallback(deviceCallback)
         if (noisyReceiverRegistered) {
@@ -169,14 +169,14 @@ class MicrophoneService : Service() {
                 return
             }
 
-            routeInput(input)
+            route(input, output)
             output.play()
             input.startRecording()
             Log.d(TAG, "Entered record loop")
 
             val buffer = ByteArray(inBufferSize)
             while (running) {
-                if (rerouteNeeded) routeInput(input)
+                if (rerouteNeeded) route(input, output)
                 val read = input.read(buffer, 0, buffer.size)
                 if (read < 0) {
                     Log.e(TAG, "AudioRecord.read failed: $read")
@@ -198,14 +198,19 @@ class MicrophoneService : Service() {
         }
     }
 
-    /** Points the recorder at the chosen mic, or lets Android pick if it isn't connected. */
-    private fun routeInput(input: AudioRecord) {
+    /** Points recording and playback at the chosen devices, or lets Android pick if they aren't connected. */
+    private fun route(input: AudioRecord, output: AudioTrack) {
         rerouteNeeded = false
-        val device = AudioInputs.selected.value?.let { AudioInputs.find(this, it) }
-        Log.d(TAG, "Routing input to ${device?.productName ?: "default"} (type ${device?.type})")
-        setCommunicationMode(device?.takeIf(AudioInputs::needsCommunicationMode))
-        input.preferredDevice = device
+        val inDevice = AudioDevices.input.current(this)
+        val outDevice = AudioDevices.output.current(this)
+        Log.d(TAG, "Routing ${describe(inDevice)} -> ${describe(outDevice)}")
+        setCommunicationMode(inDevice?.takeIf(AudioDevices::needsCommunicationMode))
+        input.preferredDevice = inDevice
+        output.preferredDevice = outDevice
     }
+
+    private fun describe(device: AudioDeviceInfo?) =
+        device?.let { "${it.productName} (type ${it.type})" } ?: "default"
 
     /**
      * Bluetooth headset mics are only open during "calls", so switch the phone into

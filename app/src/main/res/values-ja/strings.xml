@@ -6,7 +6,10 @@
     <string name="app_grant_the_permissions">このアプリは音声の録音と通知の送信許可が必要です。権限を付与してください。</string>
     <string name="grant_permissions">権限を付与</string>
     <string name="input_label">入力</string>
-    <string name="input_automatic">自動</string>
+    <string name="automatic">自動</string>
     <string name="input_phone">本体のマイク</string>
     <string name="input_headset">ヘッドセットのマイク</string>
+    <string name="output_label">出力</string>
+    <string name="output_speaker">本体のスピーカー</string>
+    <string name="output_headphones">ヘッドホン</string>
 </resources>
