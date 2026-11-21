@@ -6,7 +6,10 @@
     <string name="app_grant_the_permissions">Deze app heeft toestemming nodig om audio op te nemen en meldingen te verzenden. Geef de machtigingen.</string>
     <string name="grant_permissions">Machtigingen geven</string>
     <string name="input_label">Invoer</string>
-    <string name="input_automatic">Automatisch</string>
+    <string name="automatic">Automatisch</string>
     <string name="input_phone">Telefoonmicrofoon</string>
     <string name="input_headset">Headsetmicrofoon</string>
+    <string name="output_label">Uitvoer</string>
+    <string name="output_speaker">Telefoonluidspreker</string>
+    <string name="output_headphones">Koptelefoon</string>
 </resources>

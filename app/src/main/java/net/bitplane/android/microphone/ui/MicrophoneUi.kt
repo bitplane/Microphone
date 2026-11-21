@@ -46,7 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import net.bitplane.android.microphone.InputOption
+import net.bitplane.android.microphone.DeviceOption
 import net.bitplane.android.microphone.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,9 +54,12 @@ import net.bitplane.android.microphone.R
 fun MicrophoneScreen(
     active: Boolean,
     onToggle: () -> Unit,
-    inputs: List<InputOption>,
+    inputs: List<DeviceOption>,
     selectedInput: String?,
     onSelectInput: (String?) -> Unit,
+    outputs: List<DeviceOption>,
+    selectedOutput: String?,
+    onSelectOutput: (String?) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -112,10 +115,20 @@ fun MicrophoneScreen(
 
             Spacer(Modifier.height(48.dp))
 
-            InputPicker(
-                inputs = inputs,
+            DeviceDropdown(
+                label = stringResource(R.string.input_label),
+                options = inputs,
                 selected = selectedInput,
                 onSelect = onSelectInput,
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            DeviceDropdown(
+                label = stringResource(R.string.output_label),
+                options = outputs,
+                selected = selectedOutput,
+                onSelect = onSelectOutput,
             )
         }
     }
@@ -123,14 +136,15 @@ fun MicrophoneScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun InputPicker(
-    inputs: List<InputOption>,
+private fun DeviceDropdown(
+    label: String,
+    options: List<DeviceOption>,
     selected: String?,
     onSelect: (String?) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     // A remembered device that isn't connected right now falls back to automatic.
-    val current = inputs.firstOrNull { it.key == selected } ?: inputs.firstOrNull()
+    val current = options.firstOrNull { it.key == selected } ?: options.firstOrNull()
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -142,14 +156,14 @@ private fun InputPicker(
             onValueChange = {},
             readOnly = true,
             singleLine = true,
-            label = { Text(stringResource(R.string.input_label)) },
+            label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            inputs.forEach { option ->
+            options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option.label) },
                     onClick = {
@@ -210,9 +224,15 @@ fun MicrophoneTheme(content: @Composable () -> Unit) {
 }
 
 private val previewInputs = listOf(
-    InputOption(null, "Automatic"),
-    InputOption("phone", "Phone microphone"),
-    InputOption("bt", "Jabra Elite 85t"),
+    DeviceOption(null, "Automatic"),
+    DeviceOption("phone", "Phone microphone"),
+    DeviceOption("bt", "Jabra Elite 85t"),
+)
+
+private val previewOutputs = listOf(
+    DeviceOption(null, "Automatic"),
+    DeviceOption("speaker", "Phone speaker"),
+    DeviceOption("wired", "Headphones"),
 )
 
 @Preview(name = "Mic inactive")
@@ -225,6 +245,9 @@ private fun MicrophoneScreenPreviewInactive() {
             inputs = previewInputs,
             selectedInput = null,
             onSelectInput = {},
+            outputs = previewOutputs,
+            selectedOutput = null,
+            onSelectOutput = {},
         )
     }
 }
@@ -239,6 +262,9 @@ private fun MicrophoneScreenPreviewActive() {
             inputs = previewInputs,
             selectedInput = "bt",
             onSelectInput = {},
+            outputs = previewOutputs,
+            selectedOutput = "speaker",
+            onSelectOutput = {},
         )
     }
 }
