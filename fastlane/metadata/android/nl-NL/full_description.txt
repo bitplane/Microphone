@@ -1,0 +1,20 @@
+Microfoon maakt van je telefoon een live microfoon. Praat erin en je stem komt meteen uit de luidspreker, je koptelefoon of een Bluetooth-speaker.
+
+Ideeën:
+• Laat speelgoed praten: verstop er een Bluetooth-speaker in en praat in de telefoon
+• Praat via een Bluetooth-speaker naar de kamer ernaast, net als met een walkietalkie
+• Gebruik het als eenvoudige geluidsinstallatie voor een feest, les of voorstelling
+• Hoor jezelf via een koptelefoon terwijl je zingen of spreken oefent
+• Gebruik een Bluetooth-headset als microfoon en hoor het via de luidspreker van de telefoon
+
+Functies:
+• Kies de microfoon: telefoon, bedrade headset, Bluetooth of USB
+• Kies waar het geluid heen gaat: telefoonluidspreker, koptelefoon, Bluetooth of USB
+• Blijft werken met het scherm uit
+• Stop op elk moment via de melding
+
+Geen advertenties, geen accounts, geen tracking. De app heeft geen internettoegang, dus je stem verlaat de telefoon nooit.
+
+Tip: de microfoon en luidspreker van dezelfde telefoon samen gaan rondzingen. Gebruik een koptelefoon of een speaker op wat afstand van de telefoon.
+
+Open source: https://github.com/bitplane/Microphone

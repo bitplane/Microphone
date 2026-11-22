@@ -1,24 +1,38 @@
 # Releasing
 
-Pushing a tag like `v1.2.3` runs `.github/workflows/release.yml`. It:
+1. Write the release notes. The version code comes from the tag, `major * 10000 + minor * 100 +
+   patch`, so `v1.0.2` is `10002`. Add `fastlane/metadata/android/<language>/changelogs/10002.txt`
+   for each language (500 characters max). The release fails early if `en-US` is missing.
+2. Tag and push:
+
+   ```sh
+   git tag v1.0.2
+   git push origin v1.0.2
+   ```
+
+`.github/workflows/release.yml` then:
 
 1. builds an APK and an App Bundle, both signed with the app's original 2010 key;
 2. publishes the APK as a GitHub Release;
-3. uploads the bundle to the Play **internal testing** track, which you then promote from the
-   Play Console. This step is skipped, with a warning, until `PLAY_SERVICE_ACCOUNT_JSON` is set.
+3. sends the bundle to Play **production** with fastlane `supply`, along with the release notes
+   and the store listing. Google reviews it, then it goes live. This step is skipped, with a
+   warning, until `PLAY_SERVICE_ACCOUNT_JSON` is set.
 
-Web and Play installs are signed with the same key, so each can upgrade the other.
+Web and Play installs are signed with the same key, so each can upgrade the other. Tags must keep
+going up.
 
-The version code comes from the tag: `major * 10000 + minor * 100 + patch`, so `v1.0.0` is
-`10000`. Tags must keep going up.
+## Store listing
 
-```sh
-git tag v1.0.0
-git push origin v1.0.0
-```
+The listing lives in `fastlane/metadata/android/<language>/`: `title.txt` (30 characters max),
+`short_description.txt` (80), `full_description.txt` (4000) and `images/phoneScreenshots/`. Every
+release replaces the listing on Play with these files, so edit them here, not in the Play Console.
 
-The job runs in the `release` environment. If you add yourself as a required reviewer there, each
-release waits for your approval before it can touch the key.
+The screenshots are only kept in `en-US`. The other languages link to its `images` folder, so
+they all show the same ones. Phone screenshots can't be taller than twice their width; take them
+at 1080x1920 (`adb shell wm size 1080x1920`).
+
+The job runs in the `release` environment, which only release tags can use. If you want each
+release to wait for your approval, add yourself as a required reviewer there.
 
 ## One-off setup
 
@@ -55,7 +69,8 @@ key: CI uploads with the same key.
 2. Under IAM → Service accounts, create a service account (it needs no Cloud roles). Then
    Keys → Add key → JSON, and download the key file.
 3. Play Console → **Users and permissions → Invite new users**. Enter the service account's
-   email and give it access to this app with **Release apps to testing tracks**.
+   email and give it access to this app with **Release to production, exclude devices, and use
+   Play App Signing** and **Manage store presence**.
 4. `gh secret set --env release PLAY_SERVICE_ACCOUNT_JSON < service-account.json`, then delete
    the JSON file.
 
@@ -75,8 +90,6 @@ Play will block the release until these are done under **Policy and programs →
   Play asks for a short video showing the feature: screen-record turning it on, switching apps,
   and the notification.
 - **Target audience** and **Content rating**: re-answer these if Play asks.
-
-The store listing will also need fresh screenshots.
 
 ## Android developer verification
 

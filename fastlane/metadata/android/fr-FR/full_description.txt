@@ -1,0 +1,20 @@
+Microphone transforme votre téléphone en micro en direct. Parlez, et votre voix sort aussitôt du haut-parleur, de votre casque ou d'une enceinte Bluetooth.
+
+Idées :
+• Faites parler un jouet : cachez-y une enceinte Bluetooth et parlez dans le téléphone
+• Parlez à la pièce d'à côté via une enceinte Bluetooth, comme avec un talkie-walkie
+• Utilisez-le comme petite sono pour une fête, une classe ou un spectacle
+• Écoutez-vous au casque pendant que vous travaillez le chant ou la diction
+• Utilisez un casque Bluetooth comme micro et écoutez-le sur le haut-parleur du téléphone
+
+Fonctions :
+• Choix du micro : téléphone, casque filaire, Bluetooth ou USB
+• Choix de la sortie : haut-parleur du téléphone, casque, Bluetooth ou USB
+• Continue de fonctionner écran éteint
+• Arrêtez-le à tout moment depuis la notification
+
+Pas de pub, pas de compte, pas de pistage. L'application n'a pas accès à internet : votre voix ne quitte jamais le téléphone.
+
+Astuce : le micro et le haut-parleur d'un même téléphone provoquent un larsen. Utilisez un casque ou une enceinte un peu éloignée du téléphone.
+
+Open source : https://github.com/bitplane/Microphone

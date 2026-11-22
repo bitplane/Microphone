@@ -1,0 +1,7 @@
+Rinnovata per le versioni recenti di Android.
+• Funziona di nuovo su Android 13 e successivi
+• Continua a funzionare a schermo spento
+• Scegli il microfono: telefono, auricolare, Bluetooth o USB
+• Scegli l'uscita audio: altoparlante, cuffie o Bluetooth
+• Nuovo design, più pulito
+• Interrompila in qualsiasi momento dalla notifica

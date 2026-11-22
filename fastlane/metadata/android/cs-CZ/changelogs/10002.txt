@@ -1,0 +1,7 @@
+Přepracováno pro moderní Android.
+• Opět funguje na Androidu 13 a novějším
+• Běží i při vypnuté obrazovce
+• Vyberte mikrofon: telefon, headset, Bluetooth nebo USB
+• Vyberte, kam půjde zvuk: reproduktor, sluchátka nebo Bluetooth
+• Nový, čistší vzhled
+• Kdykoli ji zastavíte z oznámení

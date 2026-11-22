@@ -1,0 +1,7 @@
+Renovada para as versões recentes do Android.
+• Volta a funcionar no Android 13 e posteriores
+• Continua a funcionar com o ecrã desligado
+• Escolha o microfone: telemóvel, auricular, Bluetooth ou USB
+• Escolha a saída de som: altifalante, auscultadores ou Bluetooth
+• Design novo e mais limpo
+• Pare-a a qualquer momento a partir da notificação

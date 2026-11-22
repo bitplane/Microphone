@@ -1,0 +1,7 @@
+Rebuilt for modern Android.
+• Works again on Android 13 and newer
+• Keeps running with the screen off
+• Choose which microphone to use: phone, headset, Bluetooth or USB
+• Choose where the sound goes: speaker, headphones or Bluetooth
+• New, cleaner design
+• Stop it any time from the notification

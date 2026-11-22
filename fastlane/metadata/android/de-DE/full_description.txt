@@ -1,0 +1,20 @@
+Mikrofon macht dein Handy zum Live-Mikrofon. Sprich hinein, und deine Stimme kommt direkt aus dem Lautsprecher, deinen Kopfhörern oder einer Bluetooth-Box.
+
+Ideen:
+• Lass ein Spielzeug sprechen: Versteck eine Bluetooth-Box darin und sprich ins Handy
+• Sprich über eine Bluetooth-Box ins Nebenzimmer, wie mit einem Walkie-Talkie
+• Nutze es als einfache Beschallung für Feiern, Unterricht oder Aufführungen
+• Hör dich über Kopfhörer, während du Singen oder Sprechen übst
+• Nutze ein Bluetooth-Headset als Mikrofon und hör es über den Handylautsprecher
+
+Funktionen:
+• Mikrofon wählen: Handy, kabelgebundenes Headset, Bluetooth oder USB
+• Ausgabe wählen: Handylautsprecher, Kopfhörer, Bluetooth oder USB
+• Läuft auch bei ausgeschaltetem Bildschirm weiter
+• Jederzeit über die Benachrichtigung beenden
+
+Keine Werbung, keine Konten, kein Tracking. Die App hat keinen Internetzugriff, deine Stimme verlässt das Handy also nie.
+
+Tipp: Mikrofon und Lautsprecher desselben Handys zusammen erzeugen ein Rückkopplungspfeifen. Nimm Kopfhörer oder einen Lautsprecher, der etwas weiter vom Handy entfernt ist.
+
+Open Source: https://github.com/bitplane/Microphone
