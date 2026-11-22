@@ -95,7 +95,7 @@ jobs:
           releaseFiles: dist/app-release.aab
           mappingFile: dist/mapping.txt
           releaseName: ${{ steps.version.outputs.name }}
-          track: internal
+          tracks: internal
           status: completed
 
       - name: Note skipped Play upload
