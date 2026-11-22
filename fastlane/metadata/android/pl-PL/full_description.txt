@@ -1,0 +1,20 @@
+Mikrofon zamienia telefon w mikrofon na żywo. Mów do niego, a twój głos od razu popłynie z głośnika, słuchawek lub głośnika Bluetooth.
+
+Pomysły:
+• Spraw, by zabawka mówiła: schowaj w niej głośnik Bluetooth i mów do telefonu
+• Mów do sąsiedniego pokoju przez głośnik Bluetooth, jak przez krótkofalówkę
+• Użyj go jako prostego nagłośnienia na imprezę, lekcję lub przedstawienie
+• Słuchaj siebie w słuchawkach podczas ćwiczenia śpiewu lub mówienia
+• Użyj zestawu słuchawkowego Bluetooth jako mikrofonu i słuchaj przez głośnik telefonu
+
+Funkcje:
+• Wybór mikrofonu: telefon, przewodowy zestaw słuchawkowy, Bluetooth lub USB
+• Wybór wyjścia dźwięku: głośnik telefonu, słuchawki, Bluetooth lub USB
+• Działa także przy wyłączonym ekranie
+• Zatrzymasz go w każdej chwili z poziomu powiadomienia
+
+Bez reklam, bez kont, bez śledzenia. Aplikacja nie ma dostępu do internetu, więc twój głos nigdy nie opuszcza telefonu.
+
+Wskazówka: mikrofon i głośnik tego samego telefonu razem zaczną piszczeć (sprzężenie). Użyj słuchawek lub głośnika ustawionego nieco dalej od telefonu.
+
+Open source: https://github.com/bitplane/Microphone

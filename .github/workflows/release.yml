@@ -3,9 +3,11 @@ name: Release
 # Push a tag like v1.2.3 to:
 #   1. build an APK and an App Bundle signed with the app's original key,
 #   2. publish the APK as a GitHub Release,
-#   3. upload the bundle to the Play internal track (once PLAY_SERVICE_ACCOUNT_JSON
-#      is set). Promote it to production from the Play Console.
+#   3. send the bundle, release notes and store listing in fastlane/metadata/android to
+#      Play production (once PLAY_SERVICE_ACCOUNT_JSON is set). Google reviews it, then
+#      it goes live.
 # Both outputs share one signing key, so web and Play installs can upgrade each other.
+# See RELEASING.md.
 on:
   push:
     tags: ['v*.*.*']
@@ -37,8 +39,13 @@ jobs:
           if (( minor > 99 || patch > 99 )); then
             echo "::error::minor and patch must be <= 99 (got $name)"; exit 1
           fi
+          code=$(( major * 10000 + minor * 100 + patch ))
+          notes="fastlane/metadata/android/en-US/changelogs/$code.txt"
+          if [[ ! -f "$notes" ]]; then
+            echo "::error::No release notes. Add $notes (and the other languages) before tagging."; exit 1
+          fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
-          echo "code=$(( major * 10000 + minor * 100 + patch ))" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
 
       - name: Decode signing keystore
         env:
@@ -86,17 +93,28 @@ jobs:
               --title "Microphone ${{ steps.version.outputs.name }}" --generate-notes --verify-tag
           fi
 
-      - name: Upload to Play internal track
+      - uses: ruby/setup-ruby@v1
         if: env.HAS_PLAY == 'true'
-        uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: net.bitplane.android.microphone
-          releaseFiles: dist/app-release.aab
-          mappingFile: dist/mapping.txt
-          releaseName: ${{ steps.version.outputs.name }}
-          tracks: internal
-          status: completed
+          ruby-version: '3.4'
+
+      # Uploads the bundle with the release notes for this version code, and replaces the
+      # store listing (text and screenshots) with what's in the repo.
+      - name: Upload to Google Play
+        if: env.HAS_PLAY == 'true'
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          gem install fastlane --version 2.242.0 --no-document
+          fastlane supply \
+            --package_name net.bitplane.android.microphone \
+            --track production \
+            --release_status completed \
+            --aab dist/app-release.aab \
+            --mapping dist/mapping.txt \
+            --metadata_path fastlane/metadata/android \
+            --skip_upload_apk true \
+            --sync_image_upload true
 
       - name: Note skipped Play upload
         if: env.HAS_PLAY != 'true'

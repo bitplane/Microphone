@@ -1,0 +1,20 @@
+Microfono trasforma il tuo telefono in un microfono dal vivo. Parla e la tua voce esce subito dall'altoparlante, dalle cuffie o da una cassa Bluetooth.
+
+Idee:
+• Fai parlare un giocattolo: nascondici dentro una cassa Bluetooth e parla nel telefono
+• Parla alla stanza accanto con una cassa Bluetooth, come con un walkie-talkie
+• Usalo come semplice impianto audio per una festa, una lezione o uno spettacolo
+• Ascoltati in cuffia mentre ti eserciti a cantare o a parlare
+• Usa un auricolare Bluetooth come microfono e ascoltalo dall'altoparlante del telefono
+
+Funzioni:
+• Scegli il microfono: telefono, auricolare con filo, Bluetooth o USB
+• Scegli dove va il suono: altoparlante del telefono, cuffie, Bluetooth o USB
+• Continua a funzionare a schermo spento
+• Interrompilo quando vuoi dalla notifica
+
+Niente pubblicità, niente account, nessun tracciamento. L'app non ha accesso a internet, quindi la tua voce non lascia mai il telefono.
+
+Consiglio: microfono e altoparlante dello stesso telefono insieme fischiano (effetto Larsen). Usa le cuffie o una cassa un po' lontana dal telefono.
+
+Open source: https://github.com/bitplane/Microphone

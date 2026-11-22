@@ -1,0 +1,7 @@
+Für aktuelle Android-Versionen neu gebaut.
+• Funktioniert wieder unter Android 13 und neuer
+• Läuft auch bei ausgeschaltetem Bildschirm weiter
+• Mikrofon wählen: Telefon, Headset, Bluetooth oder USB
+• Ausgabe wählen: Lautsprecher, Kopfhörer oder Bluetooth
+• Neues, aufgeräumtes Design
+• Jederzeit über die Benachrichtigung beenden

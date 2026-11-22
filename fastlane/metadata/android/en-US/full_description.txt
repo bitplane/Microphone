@@ -1,0 +1,20 @@
+Microphone turns your phone into a live microphone. Speak into it and your voice comes straight out of the speaker, your headphones or a Bluetooth speaker.
+
+Ideas:
+• Make a toy talk: hide a Bluetooth speaker inside it and speak into the phone
+• Talk to the next room through a Bluetooth speaker, like a walkie-talkie
+• Use it as a simple PA for a party, a class or a show
+• Hear yourself in headphones while you practise singing or speaking
+• Use a Bluetooth headset as the mic and hear it on the phone's speaker
+
+Features:
+• Choose the microphone: phone, wired headset, Bluetooth or USB
+• Choose where the sound goes: phone speaker, headphones, Bluetooth or USB
+• Keeps working with the screen off
+• Stop it any time from the notification
+
+No ads, no accounts, no tracking. The app has no internet access, so your voice never leaves the phone.
+
+Tip: the phone's own mic and speaker together will squeal with feedback. Use headphones, or a speaker a little way from the phone.
+
+Open source: https://github.com/bitplane/Microphone

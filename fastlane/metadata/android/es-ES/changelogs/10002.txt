@@ -1,0 +1,7 @@
+Renovada para Android moderno.
+• Vuelve a funcionar en Android 13 y posteriores
+• Sigue funcionando con la pantalla apagada
+• Elige el micrófono: teléfono, auriculares con micrófono, Bluetooth o USB
+• Elige por dónde sale el sonido: altavoz, auriculares o Bluetooth
+• Diseño nuevo y más limpio
+• Detenla cuando quieras desde la notificación

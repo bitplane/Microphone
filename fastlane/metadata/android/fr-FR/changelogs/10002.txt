@@ -1,0 +1,7 @@
+Refaite pour les versions récentes d'Android.
+• Fonctionne à nouveau sous Android 13 et plus
+• Continue de fonctionner écran éteint
+• Choisissez le micro : téléphone, casque, Bluetooth ou USB
+• Choisissez la sortie : haut-parleur, écouteurs ou Bluetooth
+• Nouveau design, plus épuré
+• Arrêtez-la à tout moment depuis la notification

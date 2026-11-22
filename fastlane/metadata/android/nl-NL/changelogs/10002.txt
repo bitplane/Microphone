@@ -1,0 +1,7 @@
+Vernieuwd voor moderne Android-versies.
+• Werkt weer op Android 13 en nieuwer
+• Blijft werken met het scherm uit
+• Kies de microfoon: telefoon, headset, Bluetooth of USB
+• Kies waar het geluid heen gaat: luidspreker, koptelefoon of Bluetooth
+• Nieuw, strakker ontwerp
+• Stop op elk moment via de melding

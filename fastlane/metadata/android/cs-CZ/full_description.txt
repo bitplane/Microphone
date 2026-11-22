@@ -1,0 +1,20 @@
+Mikrofon promění váš telefon v živý mikrofon. Mluvte do něj a váš hlas zazní přímo z reproduktoru, sluchátek nebo Bluetooth reproduktoru.
+
+Nápady:
+• Rozmluvte hračku: schovejte do ní Bluetooth reproduktor a mluvte do telefonu
+• Mluvte do vedlejší místnosti přes Bluetooth reproduktor, podobně jako vysílačkou
+• Použijte ho jako jednoduché ozvučení na oslavu, do třídy nebo na představení
+• Poslouchejte se ve sluchátkách při nácviku zpěvu nebo řeči
+• Použijte Bluetooth headset jako mikrofon a poslouchejte ho z reproduktoru telefonu
+
+Funkce:
+• Výběr mikrofonu: telefon, kabelový headset, Bluetooth nebo USB
+• Výběr výstupu zvuku: reproduktor telefonu, sluchátka, Bluetooth nebo USB
+• Funguje i při vypnuté obrazovce
+• Kdykoli ho zastavíte z oznámení
+
+Žádné reklamy, žádné účty, žádné sledování. Aplikace nemá přístup k internetu, takže váš hlas nikdy neopustí telefon.
+
+Tip: mikrofon a reproduktor stejného telefonu spolu začnou pískat (zpětná vazba). Použijte sluchátka nebo reproduktor kousek od telefonu.
+
+Open source: https://github.com/bitplane/Microphone

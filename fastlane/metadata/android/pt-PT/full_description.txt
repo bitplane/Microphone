@@ -1,0 +1,20 @@
+O Microfone transforma o seu telemóvel num microfone em direto. Fale e a sua voz sai logo pelo altifalante, pelos auscultadores ou por uma coluna Bluetooth.
+
+Ideias:
+• Ponha um brinquedo a falar: esconda lá dentro uma coluna Bluetooth e fale para o telemóvel
+• Fale para a divisão ao lado através de uma coluna Bluetooth, como com um walkie-talkie
+• Use-o como uma instalação sonora simples para uma festa, uma aula ou um espetáculo
+• Ouça-se nos auscultadores enquanto pratica canto ou oratória
+• Use uns auriculares Bluetooth como microfone e ouça-os no altifalante do telemóvel
+
+Funcionalidades:
+• Escolha o microfone: telemóvel, auricular com fios, Bluetooth ou USB
+• Escolha a saída de som: altifalante do telemóvel, auscultadores, Bluetooth ou USB
+• Continua a funcionar com o ecrã desligado
+• Pare-o a qualquer momento a partir da notificação
+
+Sem anúncios, sem contas, sem rastreio. A aplicação não tem acesso à internet, por isso a sua voz nunca sai do telemóvel.
+
+Dica: o microfone e o altifalante do mesmo telemóvel juntos fazem microfonia. Use auscultadores ou uma coluna um pouco afastada do telemóvel.
+
+Código aberto: https://github.com/bitplane/Microphone

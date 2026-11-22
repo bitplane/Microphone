@@ -1,0 +1,20 @@
+Micrófono convierte tu móvil en un micrófono en directo. Habla y tu voz sale al momento por el altavoz, los auriculares o un altavoz Bluetooth.
+
+Ideas:
+• Haz hablar a un juguete: esconde dentro un altavoz Bluetooth y habla al móvil
+• Habla a la habitación de al lado con un altavoz Bluetooth, como con un walkie-talkie
+• Úsalo como megafonía sencilla para una fiesta, una clase o una función
+• Escúchate con auriculares mientras practicas canto o discursos
+• Usa unos auriculares Bluetooth como micrófono y escúchalos por el altavoz del móvil
+
+Funciones:
+• Elige el micrófono: móvil, auriculares con cable, Bluetooth o USB
+• Elige por dónde sale el sonido: altavoz del móvil, auriculares, Bluetooth o USB
+• Sigue funcionando con la pantalla apagada
+• Detenlo cuando quieras desde la notificación
+
+Sin anuncios, sin cuentas, sin rastreo. La aplicación no tiene acceso a internet, así que tu voz nunca sale del móvil.
+
+Consejo: el micrófono y el altavoz del mismo móvil juntos pitan por acoplamiento. Usa auriculares o un altavoz un poco alejado del móvil.
+
+Código abierto: https://github.com/bitplane/Microphone

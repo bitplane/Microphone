@@ -1,0 +1,7 @@
+Odświeżona dla nowych wersji Androida.
+• Znowu działa na Androidzie 13 i nowszych
+• Działa także przy wyłączonym ekranie
+• Wybierz mikrofon: telefon, zestaw słuchawkowy, Bluetooth lub USB
+• Wybierz wyjście dźwięku: głośnik, słuchawki lub Bluetooth
+• Nowy, przejrzysty wygląd
+• Zatrzymasz ją w każdej chwili z poziomu powiadomienia
