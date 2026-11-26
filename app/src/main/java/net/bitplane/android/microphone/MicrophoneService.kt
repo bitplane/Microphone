@@ -22,6 +22,7 @@ import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.IBinder
+import android.os.Process
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
@@ -148,33 +149,44 @@ class MicrophoneService : Service() {
     }
 
     private fun audioLoop() {
-        val inBufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN, ENCODING)
-        val outBufferSize = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_OUT, ENCODING)
-        if (inBufferSize <= 0 || outBufferSize <= 0) {
-            Log.e(TAG, "Unsupported audio config (in=$inBufferSize, out=$outBufferSize)")
+        Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO)
+
+        val config = pickConfig()
+        if (config == null) {
+            Log.e(TAG, "No supported audio config")
             stopSelfOnMainThread()
             return
         }
+        val rate = config.sampleRate
+        val burst = config.burstFrames
 
         var input: AudioRecord? = null
         var output: AudioTrack? = null
         try {
-            input = createAudioRecord(inBufferSize)
-            output = createAudioTrack(outBufferSize)
+            input = createAudioRecord(rate, config.inBufferBytes)
+            // Room to grow into: the input may hand over its audio in lumps bigger than the
+            // output's minimum, so the track's capacity has to cover both.
+            output = createAudioTrack(rate, maxOf(config.outBufferBytes, config.inBufferBytes) * 2)
 
-            if (input.state != AudioRecord.STATE_INITIALIZED ||
-                output.state != AudioTrack.STATE_INITIALIZED
-            ) {
+            if (input == null || output.state != AudioTrack.STATE_INITIALIZED) {
                 Log.e(TAG, "Audio devices failed to initialise")
                 return
             }
 
+            // Start with the smallest playback queue and only grow it when playback runs dry.
+            val tunable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+            val capacity = if (tunable) output.bufferCapacityInFrames else 0
+            var queueFrames = 0
+            if (tunable) queueFrames = output.setBufferSizeInFrames(2 * burst)
+            var underruns = 0
+            Log.d(TAG, "Audio at $rate Hz, burst $burst frames, queue $queueFrames of $capacity frames")
+
             route(input, output)
-            output.play()
             input.startRecording()
+            output.play()
             Log.d(TAG, "Entered record loop")
 
-            val buffer = ByteArray(inBufferSize)
+            val buffer = ShortArray(burst)
             while (running) {
                 if (rerouteNeeded) route(input, output)
                 val read = input.read(buffer, 0, buffer.size)
@@ -182,7 +194,22 @@ class MicrophoneService : Service() {
                     Log.e(TAG, "AudioRecord.read failed: $read")
                     break
                 }
-                if (read > 0) output.write(buffer, 0, read)
+                if (read == 0) continue
+
+                if (tunable) {
+                    // Whatever doesn't fit in the queue is dropped, so latency can't build up.
+                    output.write(buffer, 0, read, AudioTrack.WRITE_NON_BLOCKING)
+                    val now = output.underrunCount
+                    if (now > underruns) {
+                        underruns = now
+                        if (queueFrames + burst <= capacity) {
+                            queueFrames = output.setBufferSizeInFrames(queueFrames + burst)
+                            Log.d(TAG, "Underrun, queue now $queueFrames frames")
+                        }
+                    }
+                } else {
+                    output.write(buffer, 0, read)
+                }
             }
             Log.d(TAG, "Record loop finished")
         } catch (e: Exception) {
@@ -196,6 +223,29 @@ class MicrophoneService : Service() {
             // If the loop died on its own (not via onDestroy), take the service down with it.
             if (running) stopSelfOnMainThread()
         }
+    }
+
+    private class AudioConfig(
+        val sampleRate: Int,
+        val burstFrames: Int,
+        val inBufferBytes: Int,
+        val outBufferBytes: Int,
+    )
+
+    /**
+     * Uses the output's native rate and burst size, which is what Android needs to put
+     * us on its fast path. Falls back to common rates on phones that don't report them.
+     */
+    private fun pickConfig(): AudioConfig? {
+        val nativeRate = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)?.toIntOrNull()
+        val burst = audioManager.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)
+            ?.toIntOrNull()?.takeIf { it > 0 } ?: DEFAULT_BURST
+        for (rate in listOfNotNull(nativeRate, 48000, 44100).distinct()) {
+            val inBytes = AudioRecord.getMinBufferSize(rate, CHANNEL_IN, ENCODING)
+            val outBytes = AudioTrack.getMinBufferSize(rate, CHANNEL_OUT, ENCODING)
+            if (inBytes > 0 && outBytes > 0) return AudioConfig(rate, burst, inBytes, outBytes)
+        }
+        return null
     }
 
     /** Points recording and playback at the chosen devices, or lets Android pick if they aren't connected. */
@@ -243,12 +293,41 @@ class MicrophoneService : Service() {
         ContextCompat.getMainExecutor(this).execute { stopSelf() }
     }
 
+    /**
+     * Prefers the input meant for live performance, which skips the processing that adds
+     * delay. Not every phone can open every source, so falls back until one works.
+     */
     // Permission is checked in onStartCommand before the loop starts.
     @Suppress("MissingPermission")
-    private fun createAudioRecord(bufferSize: Int): AudioRecord =
-        AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, CHANNEL_IN, ENCODING, bufferSize)
+    private fun createAudioRecord(rate: Int, bufferBytes: Int): AudioRecord? {
+        val sources = buildList {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(MediaRecorder.AudioSource.VOICE_PERFORMANCE)
+            add(MediaRecorder.AudioSource.MIC)
+        }
+        for (source in sources) {
+            val record = runCatching {
+                AudioRecord.Builder()
+                    .setAudioSource(source)
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(ENCODING)
+                            .setChannelMask(CHANNEL_IN)
+                            .setSampleRate(rate)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(bufferBytes)
+                    .build()
+            }.getOrNull()
+            if (record?.state == AudioRecord.STATE_INITIALIZED) {
+                Log.d(TAG, "Recording from source $source")
+                return record
+            }
+            record?.release()
+        }
+        return null
+    }
 
-    private fun createAudioTrack(bufferSize: Int): AudioTrack {
+    private fun createAudioTrack(rate: Int, bufferSize: Int): AudioTrack {
         val builder = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -260,7 +339,7 @@ class MicrophoneService : Service() {
                 AudioFormat.Builder()
                     .setEncoding(ENCODING)
                     .setChannelMask(CHANNEL_OUT)
-                    .setSampleRate(SAMPLE_RATE)
+                    .setSampleRate(rate)
                     .build()
             )
             .setBufferSizeInBytes(bufferSize)
@@ -307,7 +386,8 @@ class MicrophoneService : Service() {
         private const val CHANNEL_ID = "microphone_channel_id"
         private const val NOTIFICATION_ID = 1
 
-        private const val SAMPLE_RATE = 44100
+        // Frames per read and write when the phone doesn't say what its fast path uses.
+        private const val DEFAULT_BURST = 256
         // Mono is the only input channel config every device is guaranteed to support.
         private const val CHANNEL_IN = AudioFormat.CHANNEL_IN_MONO
         private const val CHANNEL_OUT = AudioFormat.CHANNEL_OUT_MONO

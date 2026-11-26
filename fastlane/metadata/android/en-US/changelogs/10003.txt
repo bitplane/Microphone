@@ -1,0 +1,1 @@
+Much less delay between the microphone and the speaker or headphones.
